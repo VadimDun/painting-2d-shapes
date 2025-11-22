@@ -5,9 +5,10 @@
 #include <vector>
 #include <string>
 
-GLuint Program;
 GLuint Attrib_vertex;
 GLuint VBO;
+GLuint ProgramQuad, ProgramFan, ProgramPentagon;
+GLuint Attrib_vertex_quad, Attrib_vertex_fan, Attrib_vertex_pentagon;
 
 struct Vertex {
     GLfloat x;
@@ -22,7 +23,23 @@ const char* VertexShaderSource = R"(
     }
 )";
 
-const char* FragShaderSource = R"(
+const char* FragShaderSourceQuad = R"(
+    #version 330 core
+    out vec4 color;
+    void main() {
+        color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    }
+)";
+
+const char* FragShaderSourceFan = R"(
+    #version 330 core
+    out vec4 color;
+    void main() {
+        color = vec4(0.0f, 0.0f, 1.0f, 1.0f);
+    }
+)";
+
+const char* FragShaderSourcePentagon = R"(
     #version 330 core
     out vec4 color;
     void main() {
@@ -42,27 +59,63 @@ void ShaderLog(unsigned int shader) {
 }
 
 void InitShader() {
-    GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vShader, 1, &VertexShaderSource, NULL);
-    glCompileShader(vShader);
-    std::cout << "Vertex shader log:" << std::endl;
-    ShaderLog(vShader);
+    // Quad
+    GLuint vShaderQuad = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vShaderQuad, 1, &VertexShaderSource, NULL);
+    glCompileShader(vShaderQuad);
 
-    GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fShader, 1, &FragShaderSource, NULL);
-    glCompileShader(fShader);
-    std::cout << "Fragment shader log:" << std::endl;
-    ShaderLog(fShader);
+    GLuint fShaderQuad = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fShaderQuad, 1, &FragShaderSourceQuad, NULL);
+    glCompileShader(fShaderQuad);
 
-    Program = glCreateProgram();
-    glAttachShader(Program, vShader);
-    glAttachShader(Program, fShader);
-    glLinkProgram(Program);
+    ProgramQuad = glCreateProgram();
+    glAttachShader(ProgramQuad, vShaderQuad);
+    glAttachShader(ProgramQuad, fShaderQuad);
+    glLinkProgram(ProgramQuad);
 
-    const char* attr_name = "coord";
-    Attrib_vertex = glGetAttribLocation(Program, attr_name);
+    Attrib_vertex_quad = glGetAttribLocation(ProgramQuad, "coord");
     if (Attrib_vertex == -1) {
-        std::cout << "Could not bind attrib " << attr_name << std::endl;
+        std::cout << "Could not bind attrib " << Attrib_vertex_quad << std::endl;
+        return;
+    }
+
+    // Fan
+    GLuint vShaderFan = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vShaderFan, 1, &VertexShaderSource, NULL);
+    glCompileShader(vShaderFan);
+
+    GLuint fShaderFan = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fShaderFan, 1, &FragShaderSourceFan, NULL);
+    glCompileShader(fShaderFan);
+
+    ProgramFan = glCreateProgram();
+    glAttachShader(ProgramFan, vShaderFan);
+    glAttachShader(ProgramFan, fShaderFan);
+    glLinkProgram(ProgramFan);
+
+    Attrib_vertex_fan = glGetAttribLocation(ProgramFan, "coord");
+    if (Attrib_vertex == -1) {
+        std::cout << "Could not bind attrib " << Attrib_vertex_fan << std::endl;
+        return;
+    }
+
+    // Pentagon
+    GLuint vShaderPentagon = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vShaderPentagon, 1, &VertexShaderSource, NULL);
+    glCompileShader(vShaderPentagon);
+
+    GLuint fShaderPentagon = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fShaderPentagon, 1, &FragShaderSourcePentagon, NULL);
+    glCompileShader(fShaderPentagon);
+
+    ProgramPentagon = glCreateProgram();
+    glAttachShader(ProgramPentagon, vShaderPentagon);
+    glAttachShader(ProgramPentagon, fShaderPentagon);
+    glLinkProgram(ProgramPentagon);
+
+    Attrib_vertex_pentagon = glGetAttribLocation(ProgramPentagon, "coord");
+    if (Attrib_vertex == -1) {
+        std::cout << "Could not bind attrib " << Attrib_vertex_pentagon << std::endl;
         return;
     }
 }
@@ -72,7 +125,7 @@ std::vector<Vertex> createPentagon(float centerX, float centerY, float radius) {
     std::vector<Vertex> pentagon;
     for (int i = 0; i < 5; ++i) {
         float angle = 2.0f * 3.14159f * i / 5.0f;
-       
+
         Vertex v;
         v.x = centerX + radius * cos(angle);
         v.y = centerY + radius * sin(angle);
@@ -135,30 +188,38 @@ void Init() {
 }
 
 void Draw() {
-    glUseProgram(Program);
-    glEnableVertexAttribArray(Attrib_vertex);
-
+    // Quad
+    glUseProgram(ProgramQuad);
+    glEnableVertexAttribArray(Attrib_vertex_quad);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glVertexAttribPointer(Attrib_vertex, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-    // quad
+    glVertexAttribPointer(Attrib_vertex_quad, 2, GL_FLOAT, GL_FALSE, 0, 0);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-
-    // fan
+    glDisableVertexAttribArray(Attrib_vertex_quad);
+    
+    // Fan
+    glUseProgram(ProgramFan);
+    glEnableVertexAttribArray(Attrib_vertex_fan);
+    glVertexAttribPointer(Attrib_vertex_fan, 2, GL_FLOAT, GL_FALSE, 0, 0);
     glDrawArrays(GL_TRIANGLE_FAN, 6, 11);
+    glDisableVertexAttribArray(Attrib_vertex_fan);
 
-    // pentagon
+    // Pentagon
+    glUseProgram(ProgramPentagon);
+    glEnableVertexAttribArray(Attrib_vertex_pentagon);
+    glVertexAttribPointer(Attrib_vertex_pentagon, 2, GL_FLOAT, GL_FALSE, 0, 0);
     glDrawArrays(GL_TRIANGLES, 17, 15);
+    glDisableVertexAttribArray(Attrib_vertex_pentagon);
 
     glBindBuffer(GL_ARRAY_BUFFER, NULL);
-    glDisableVertexAttribArray(Attrib_vertex);
     glUseProgram(0);
 }
 
 void Release() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDeleteBuffers(1, &VBO);
-    glDeleteProgram(Program);
+    glDeleteProgram(ProgramQuad);
+    glDeleteProgram(ProgramFan);
+    glDeleteProgram(ProgramPentagon);
 }
 
 int main() {
