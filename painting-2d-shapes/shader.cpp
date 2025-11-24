@@ -66,17 +66,18 @@ if (infologLen > 1) {
 }
 
 void InitShader() {
-// Quad
-GLuint vShaderQuad = glCreateShader(GL_VERTEX_SHADER);
-glShaderSource(vShaderQuad, 1, &VertexShaderSource, NULL);
-glCompileShader(vShaderQuad);
 
+GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
+glShaderSource(vShader, 1, &VertexShaderSource, NULL);
+glCompileShader(vShader);
+
+// Quad
 GLuint fShaderQuad = glCreateShader(GL_FRAGMENT_SHADER);
 glShaderSource(fShaderQuad, 1, &FragShaderSourceQuad, NULL);
 glCompileShader(fShaderQuad);
 
 ProgramQuad = glCreateProgram();
-glAttachShader(ProgramQuad, vShaderQuad);
+glAttachShader(ProgramQuad, vShader);
 glAttachShader(ProgramQuad, fShaderQuad);
 glLinkProgram(ProgramQuad);
 
@@ -87,16 +88,12 @@ if (Attrib_vertex_quad == -1) {
 }
 
 // Fan
-GLuint vShaderFan = glCreateShader(GL_VERTEX_SHADER);
-glShaderSource(vShaderFan, 1, &VertexShaderSource, NULL);
-glCompileShader(vShaderFan);
-
 GLuint fShaderFan = glCreateShader(GL_FRAGMENT_SHADER);
 glShaderSource(fShaderFan, 1, &FragShaderSourceFan, NULL);
 glCompileShader(fShaderFan);
 
 ProgramFan = glCreateProgram();
-glAttachShader(ProgramFan, vShaderFan);
+glAttachShader(ProgramFan, vShader);
 glAttachShader(ProgramFan, fShaderFan);
 glLinkProgram(ProgramFan);
 
@@ -107,16 +104,12 @@ if (Attrib_vertex_fan == -1) {
 }
 
 // Pentagon
-GLuint vShaderPentagon = glCreateShader(GL_VERTEX_SHADER);
-glShaderSource(vShaderPentagon, 1, &VertexShaderSource, NULL);
-glCompileShader(vShaderPentagon);
-
 GLuint fShaderPentagon = glCreateShader(GL_FRAGMENT_SHADER);
 glShaderSource(fShaderPentagon, 1, &FragShaderSourcePentagon, NULL);
 glCompileShader(fShaderPentagon);
 
 ProgramPentagon = glCreateProgram();
-glAttachShader(ProgramPentagon, vShaderPentagon);
+glAttachShader(ProgramPentagon, vShader);
 glAttachShader(ProgramPentagon, fShaderPentagon);
 glLinkProgram(ProgramPentagon);
 
@@ -126,17 +119,12 @@ if (Attrib_vertex_pentagon == -1) {
     return;
 }
 
-
-GLuint vShaderUniversal = glCreateShader(GL_VERTEX_SHADER);
-glShaderSource(vShaderUniversal, 1, &VertexShaderSource, NULL);
-glCompileShader(vShaderUniversal);
-
 GLuint fShaderUniversal = glCreateShader(GL_FRAGMENT_SHADER);
 glShaderSource(fShaderUniversal, 1, &FragShaderSourceUniversal, NULL);
 glCompileShader(fShaderUniversal);
 
 ProgramUniversal = glCreateProgram();
-glAttachShader(ProgramUniversal, vShaderUniversal);
+glAttachShader(ProgramUniversal, vShader);
 glAttachShader(ProgramUniversal, fShaderUniversal);
 glLinkProgram(ProgramUniversal);
 
