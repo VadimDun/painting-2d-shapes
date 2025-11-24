@@ -41,6 +41,19 @@ void main() {
 }
 )";
 
+GLuint ProgramUniversal; 
+GLuint Attrib_vertex_universal;  
+GLuint Uniform_color;
+
+const char* FragShaderSourceUniversal = R"(
+#version 330 core
+uniform vec4 objColor;  
+out vec4 color;
+void main() {
+    color = objColor;  
+}
+)";
+
 void ShaderLog(unsigned int shader) {
 int infologLen = 0;
 glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infologLen);
@@ -112,7 +125,35 @@ if (Attrib_vertex_pentagon == -1) {
     std::cout << "Could not bind attrib " << Attrib_vertex_pentagon << std::endl;
     return;
 }
+
+
+GLuint vShaderUniversal = glCreateShader(GL_VERTEX_SHADER);
+glShaderSource(vShaderUniversal, 1, &VertexShaderSource, NULL);
+glCompileShader(vShaderUniversal);
+
+GLuint fShaderUniversal = glCreateShader(GL_FRAGMENT_SHADER);
+glShaderSource(fShaderUniversal, 1, &FragShaderSourceUniversal, NULL);
+glCompileShader(fShaderUniversal);
+
+ProgramUniversal = glCreateProgram();
+glAttachShader(ProgramUniversal, vShaderUniversal);
+glAttachShader(ProgramUniversal, fShaderUniversal);
+glLinkProgram(ProgramUniversal);
+
+Attrib_vertex_universal = glGetAttribLocation(ProgramUniversal, "coord");
+if (Attrib_vertex_universal == -1) {
+    std::cout << "Could not bind attrib coord in universal program" << std::endl;
+    return;
 }
+
+    
+Uniform_color = glGetUniformLocation(ProgramUniversal, "objColor");
+if (Uniform_color == -1) {
+    std::cout << "Could not bind uniform objColor" << std::endl;
+    return;
+}
+}
+
 
 // ������� ������� ����������� �������������
 std::vector<Vertex> createPentagon(float centerX, float centerY, float radius) {
@@ -209,14 +250,20 @@ switch (currentAssignment) {
         break;
     }
     case ASSIGNMENT_3: {
-        // TODO TASK3
-        glUseProgram(ProgramQuad);
-        glEnableVertexAttribArray(Attrib_vertex_quad);
-        glVertexAttribPointer(Attrib_vertex_quad, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glUseProgram(ProgramUniversal);
+        glEnableVertexAttribArray(Attrib_vertex_universal);
+        glVertexAttribPointer(Attrib_vertex_universal, 2, GL_FLOAT, GL_FALSE, 0, 0);
+            
+        glUniform4f(Uniform_color, 1.0f, 0.0f, 1.0f, 1.0f);
         glDrawArrays(GL_TRIANGLES, 0, 6);
+            
+        glUniform4f(Uniform_color, 1.0f, 0.5f, 0.0f, 1.0f);
         glDrawArrays(GL_TRIANGLE_FAN, 6, 11);
+            
+        glUniform4f(Uniform_color, 0.0f, 1.0f, 1.0f, 1.0f);
         glDrawArrays(GL_TRIANGLES, 17, 15);
-        glDisableVertexAttribArray(Attrib_vertex_quad);
+            
+        glDisableVertexAttribArray(Attrib_vertex_universal);
         break;
     }
     case ASSIGNMENT_4: {
@@ -241,4 +288,5 @@ glDeleteBuffers(1, &VBO);
 glDeleteProgram(ProgramQuad);
 glDeleteProgram(ProgramFan);
 glDeleteProgram(ProgramPentagon);
+glDeleteProgram(ProgramUniversal);
 }

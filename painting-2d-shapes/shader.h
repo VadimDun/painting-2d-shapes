@@ -30,7 +30,7 @@ extern const char* FragShaderSourcePentagon;
 void ShaderLog(unsigned int shader);
 void InitShader();
 
-// VBO (может быть в другой файл?)
+// VBO (пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ?)
 std::vector<Vertex> createPentagon(float centerX, float centerY, float radius);
 void InitVBO();
 void Init();
