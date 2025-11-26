@@ -204,6 +204,24 @@ std::vector<Vertex> createPentagon(float centerX, float centerY, float radius) {
     return pentagon;
 }
 
+std::vector<Vertex> createFan(float centerX, float centerY, float radius, int segments, float startAngle, float endAngle) {
+    std::vector<Vertex> fan;
+
+    // Центр веера
+    fan.push_back({ centerX, centerY });
+
+    // Вершины по окружности
+    float angleStep = (endAngle - startAngle) / (segments - 1);
+    for (int i = 0; i < segments; ++i) {
+        float angle = startAngle + i * angleStep;
+        float x = centerX + radius * cos(angle);
+        float y = centerY + radius * sin(angle);
+        fan.push_back({ x, y });
+    }
+
+    return fan;
+}
+
 std::vector<ColorVertex> createGradientVertices() {
     std::vector<ColorVertex> gradientVertices;
     
@@ -217,18 +235,21 @@ std::vector<ColorVertex> createGradientVertices() {
     gradientVertices.push_back({-0.8f, -0.3f, 1.0f, 1.0f, 0.0f, 1.0f}); // желтый
 
     // Веер
-    gradientVertices.push_back({0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f});
-    
-    gradientVertices.push_back({0.47f, 0.17f, 1.0f, 0.0f, 0.0f, 1.0f}); // красный
-    gradientVertices.push_back({0.41f, 0.32f, 1.0f, 0.5f, 0.0f, 1.0f}); // оранжевый
-    gradientVertices.push_back({0.32f, 0.44f, 1.0f, 1.0f, 0.0f, 1.0f}); // желтый
-    gradientVertices.push_back({0.21f, 0.53f, 0.0f, 1.0f, 0.0f, 1.0f}); // зеленый
-    gradientVertices.push_back({0.07f, 0.57f, 0.0f, 1.0f, 1.0f, 1.0f}); // голубой
-    gradientVertices.push_back({-0.07f, 0.57f, 0.0f, 0.0f, 1.0f, 1.0f}); // синий
-    gradientVertices.push_back({-0.21f, 0.53f, 0.5f, 0.0f, 1.0f, 1.0f}); // фиолетовый
-    gradientVertices.push_back({-0.32f, 0.44f, 1.0f, 0.0f, 1.0f, 1.0f}); // пурпурный
-    gradientVertices.push_back({-0.41f, 0.32f, 1.0f, 0.0f, 0.5f, 1.0f}); // розовый
-    gradientVertices.push_back({-0.47f, 0.17f, 0.5f, 0.5f, 0.5f, 1.0f}); // серый
+    std::vector<Vertex> fan = createFan(0.0f, 0.0f, 0.5f, 10, 3.14159 / 8, 3.14159 * 7 / 8);
+
+    std::vector<std::vector<float>> fanColors = {
+        {1.0f, 0.0f, 0.0f, 1.0f}, {1.0f, 0.5f, 0.0f, 1.0f}, {1.0f, 1.0f, 0.0f, 1.0f},
+        {0.5f, 1.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 1.0f, 1.0f},
+        {0.0f, 0.0f, 1.0f, 1.0f}, {0.5f, 0.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 1.0f, 1.0f},
+        {1.0f, 0.0f, 0.5f, 1.0f}
+    };
+
+    gradientVertices.push_back({ fan[0].x, fan[0].y, 1.0f, 1.0f, 1.0f, 1.0f });
+    for (int i = 1; i < fan.size(); ++i) {
+        gradientVertices.push_back({ fan[i].x, fan[i].y,
+                                  fanColors[i - 1][0], fanColors[i - 1][1],
+                                  fanColors[i - 1][2], fanColors[i - 1][3] });
+    }
 
     // Пятиугольник
     Vertex center = {0.5f, -0.5f};
@@ -262,11 +283,12 @@ void InitVBO() {
         {-0.8f, -0.8f}, {-0.3f, -0.3f}, {-0.8f, -0.3f}
     };
 
-    std::vector<Vertex> fan = {
-        {0.0f, 0.0f}, {0.47f, 0.17f}, {0.41f, 0.32f}, {0.32f, 0.44f},
-        {0.21f, 0.53f}, {0.07f, 0.57f}, {-0.07f, 0.57f}, {-0.21f, 0.53f},
-        {-0.32f, 0.44f}, {-0.41f, 0.32f}, {-0.47f, 0.17f}
-    };
+    //std::vector<Vertex> fan = {
+    //    {0.0f, 0.0f}, {0.47f, 0.17f}, {0.41f, 0.32f}, {0.32f, 0.44f},
+    //    {0.21f, 0.53f}, {0.07f, 0.57f}, {-0.07f, 0.57f}, {-0.21f, 0.53f},
+    //    {-0.32f, 0.44f}, {-0.41f, 0.32f}, {-0.47f, 0.17f}
+    //};
+    std::vector<Vertex> fan = createFan(0.0f, 0.0f, 0.5f, 10, 3.14159 / 8, 3.14159 * 7 / 8);
 
     std::vector<Vertex> pentagonVertices;
     Vertex center = {0.5f, -0.5f};
